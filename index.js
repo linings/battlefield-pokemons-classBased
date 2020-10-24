@@ -1,7 +1,7 @@
 class Application {
   constructor() {}
   start = () => {
-    console.log('Hello');
+    console.log('Hello World!');
   };
 }
 export default Application;
