@@ -10,10 +10,16 @@
     <script src="pixi.min.js"></script>
     <!-- <script type="module" src="./index.js"></script> -->
     <script type="module">
-      import Application from './index.js';
+      import App from './App.js';
 
-      const app = new Application();
-      app.start();
+      const app = new App();
+
+      const dimensions = {
+        width: 800,
+        height: 1600,
+      };
+
+      app.start(dimensions);
     </script>
   </body>
 </html>
