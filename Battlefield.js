@@ -2,13 +2,27 @@ import FetchToApi from './fetchToApi.js';
 import Sprite from './Sprite.js';
 
 class Battlefield {
-  constructor(app) {
+  constructor(app, battlefield) {
     this.fetchToApi = new FetchToApi();
     this.spriteImages = [];
     this.animatedSprite = '';
     this.Text = PIXI.Text;
     this.TextStyle = PIXI.TextStyle;
+    this.Container = PIXI.Container;
+    this.Graphics = PIXI.Graphics;
+    this.healthDecreaser = 0;
     this.application = app;
+    this.battlefield = battlefield;
+    this.style = new this.TextStyle({
+      fontFamily: 'Arial',
+      fontSize: 12,
+      fill: '#8FBC8F',
+      strokeThickness: 4,
+      dropShadow: true,
+      dropShadowBlur: 4,
+      dropShadowAngle: Math.PI / 6,
+      dropShadowDistance: 4,
+    });
   }
 
   render = async () => {
@@ -85,95 +99,116 @@ class Battlefield {
       this.animatedSprite = new PIXI.AnimatedSprite([texture]);
 
       let animation = this.animatedSprite;
-      let name = new Text(`name: ${[result[i]['name']]}`);
-      let ability = new Text(`ability: ${[result[0]['ability']]}`);
+      let name = new this.Text(`name: ${[result[i]['name']]}`, this.style);
+      let ability = new this.Text(
+        `ability: ${[result[0]['ability']]}`,
+        this.style
+      );
+
+      const [move1, move2, move3, move4] = this.createMoves(result, i);
+
+      const [
+        speed,
+        specialDefense,
+        specialAttack,
+        defense,
+        attack,
+        health,
+      ] = this.createStats(result, i);
 
       if (i !== 0 && i % 5 === 0) {
         position += 5;
         hp += hpIncreaser;
       }
       let vp = 155 * (i - position) + 25;
-
       animation.position.set(vp, hp);
 
-      // if (i <= 4) {
-      //   const vp = 155 * i + 25;
-      //   const hp = 0;
-      //   sprite.animation.position.set(vp, hp);
-      //   // creatingText(vp, hp, [
-      //   //   name,
-      //   //   ability,
-      //   //   move1,
-      //   //   move2,
-      //   //   move3,
-      //   //   move4,
-      //   //   speed,
-      //   //   specialDefense,
-      //   //   specialAttack,
-      //   //   defense,
-      //   //   attack,
-      //   //   health,
-      //   // ]);
-      // }
-      // if (i > 4 && i <= 9) {
-      //   const vp = 155 * (i - 5) + 25;
-      //   const hp = 400;
-      //   sprite.animation.position.set(vp, hp);
-      //   // creatingText(vp, hp, [
-      //   //   name,
-      //   //   ability,
-      //   //   move1,
-      //   //   move2,
-      //   //   move3,
-      //   //   move4,
-      //   //   speed,
-      //   //   specialDefense,
-      //   //   specialAttack,
-      //   //   defense,
-      //   //   attack,
-      //   //   health,
-      //   // ]);
-      // }
-      // if (i > 9 && i <= 14) {
-      //   const vp = 155 * (i - 10) + 25;
-      //   const hp = 800;
-      //   sprite.animation.position.set(vp, hp);
-      //   // creatingText(vp, hp, [
-      //   //   name,
-      //   //   ability,
-      //   //   move1,
-      //   //   move2,
-      //   //   move3,
-      //   //   move4,
-      //   //   speed,
-      //   //   specialDefense,
-      //   //   specialAttack,
-      //   //   defense,
-      //   //   attack,
-      //   //   health,
-      //   // ]);
-      // }
-      // if (i > 14) {
-      //   const vp = 155 * (i - 15) + 25;
-      //   const hp = 1200;
-      //   sprite.animation.position.set(vp, hp);
-      //   // creatingText(vp, hp, [
-      //   //   name,
-      //   //   ability,
-      //   //   move1,
-      //   //   move2,
-      //   //   move3,
-      //   //   move4,
-      //   //   speed,
-      //   //   specialDefense,
-      //   //   specialAttack,
-      //   //   defense,
-      //   //   attack,
-      //   //   health,
-      //   // ]);
-      // }
+      this.createText(vp, hp, [
+        name,
+        ability,
+        move1,
+        move2,
+        move3,
+        move4,
+        speed,
+        specialDefense,
+        specialAttack,
+        defense,
+        attack,
+        health,
+      ]);
 
-      this.application.stage.addChild(animation);
+      let sprite = new Sprite(this.application,this.battlefield);
+
+      sprite.pickAFighter(animation, result);
+
+      this.application.stage.addChild(
+        animation,
+        name,
+        ability,
+        move1,
+        move2,
+        move3,
+        move4,
+        speed,
+        specialDefense,
+        specialAttack,
+        defense,
+        attack,
+        health
+      );
+    }
+  };
+
+  createMoves = (result, i) => {
+    let moves = [];
+    let movesFromInput = result[i].moves;
+
+    for (let i = 0; i < movesFromInput.length; i++) {
+      let currentMove = new this.Text(
+        `move ${i + 1}: ${movesFromInput[i].move.name}`,
+        this.style
+      );
+      moves.push(currentMove);
+    }
+
+    return moves;
+  };
+
+  createStats = (result, i) => {
+    let stats = {};
+
+    for (let j = 0; j < Object.keys(result[i].stats).length; j++) {
+      stats[Object.entries(result[i].stats)[j][0]] = Object.entries(
+        result[i].stats
+      )[j][1];
+    }
+
+    let speed = new this.Text(`speed: ${stats.speed}`, this.style);
+    let specialDefense = new this.Text(
+      `special-defense: ${stats['special-defense']}`,
+      this.style
+    );
+    let specialAttack = new this.Text(
+      `special-attack: ${stats['special-attack']}`,
+      this.style
+    );
+    let defense = new this.Text(`defense: ${stats.defense}`, this.style);
+    let attack = new this.Text(`attack: ${stats.attack}`, this.style);
+    let health = new this.Text(`HP: ${stats.hp}`, this.style);
+
+    return [speed, specialDefense, specialAttack, defense, attack, health];
+  };
+
+  createText = (vp, hp, spriteSpecialties) => {
+    const moveVertically = 120;
+    const spaceBetweenText = 20;
+
+    for (let i = 0; i < spriteSpecialties.length; i++) {
+      spriteSpecialties[i].position.set(
+        vp,
+        hp + moveVertically + i * spaceBetweenText
+      );
     }
   };
 }
