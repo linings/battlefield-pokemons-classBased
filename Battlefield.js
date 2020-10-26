@@ -138,9 +138,10 @@ class Battlefield {
         health,
       ]);
 
-      let sprite = new Sprite(this.application,this.battlefield);
+      let sprite = new Sprite(this.application, this.battlefield);
 
       sprite.pickAFighter(animation, result);
+
 
       this.application.stage.addChild(
         animation,

@@ -55,7 +55,8 @@ class Sprite {
 
     this.displayNameOfFighter(fighter, competitor, 120, 550, 220);
 
-    fighter.fight(
+    this.fight(
+      fighter,
       competitor,
       [firstSprite, secondSprite],
       this.healthDecreaser
@@ -66,26 +67,17 @@ class Sprite {
   loadRandomFighter = (result, animation) => {
     let spriteOne, spriteTwo;
 
-    let fighter = new Sprite();
-    let competitor = new Sprite();
-
-    fighter.infoAboutSprite = result.find(
+    let fighter = result.find(
       (f) => f.sprite_front === animation.texture.textureCacheIds[0]
     );
 
-    spriteOne = this.addFightersToStage(fighter.infoAboutSprite.sprite_back);
+    spriteOne = this.addFightersToStage(fighter.sprite_back);
     spriteOne.position.set(120, 120);
 
-    competitor.infoAboutSprite =
-      result[Math.floor(Math.random() * result.length)];
+    let competitor = result[Math.floor(Math.random() * result.length)];
 
-    if (
-      competitor.infoAboutSprite.sprite_front !==
-      fighter.infoAboutSprite.sprite_front
-    ) {
-      spriteTwo = this.addFightersToStage(
-        competitor.infoAboutSprite.sprite_front
-      );
+    if (competitor.sprite_front !== fighter.sprite_front) {
+      spriteTwo = this.addFightersToStage(competitor.sprite_front);
       spriteTwo.position.set(550, 120);
     } else {
       this.loadRandomFighter();
@@ -103,6 +95,10 @@ class Sprite {
   };
 
   makeHPbar1 = (healthBarPosition, x, y, w, h) => {
+    const app = new App();
+    console.log(app);
+
+    console.log(this);
     this.healthBar1 = new this.Container();
     this.healthBar1.position.set(healthBarPosition, 4);
     this.battlefield.stage.addChild(this.healthBar1);
@@ -123,6 +119,8 @@ class Sprite {
   };
 
   makeHPbar2 = (healthBarPosition, x, y, w, h) => {
+    console.log(this);
+
     this.healthBar2 = new this.Container();
     this.healthBar2.position.set(healthBarPosition, 4);
     this.battlefield.stage.addChild(this.healthBar2);
@@ -149,24 +147,21 @@ class Sprite {
     competitorVPosition,
     hPosition
   ) => {
-    let fighterName = new this.Text(
-      `name: ${[fighter.infoAboutSprite['name']]}`,
-      this.style
-    );
+    let fighterName = new this.Text(`name: ${[fighter['name']]}`, this.style);
     fighterName.position.set(fighterVPosition, hPosition);
     this.battlefield.stage.addChild(fighterName);
 
     let competitorName = new this.Text(
-      `name: ${[competitor.infoAboutSprite['name']]}`,
+      `name: ${[competitor['name']]}`,
       this.style
     );
     competitorName.position.set(competitorVPosition, hPosition);
     this.battlefield.stage.addChild(competitorName);
   };
 
-  fight = (competitor, sprites) => {
-    const myStats = this.infoAboutSprite.stats;
-    const competitorStats = competitor.infoAboutSprite.stats;
+  fight = (fighter, competitor, sprites) => {
+    const myStats = fighter.stats;
+    const competitorStats = competitor.stats;
     let damage = 0;
 
     if (myStats.speed > competitorStats.speed) {
@@ -198,6 +193,7 @@ class Sprite {
     const [fighter, competitor] = sprites;
 
     const app = new App();
+    // console.log(app);
     app.battlefield.ticker.add(() =>
       this.play(fighter, competitor, myStats, competitorStats, damage)
     );
@@ -242,9 +238,9 @@ class Sprite {
         attacker.vx = 0;
         this.setBlinking(blinker);
 
-        // this.healthDecreaser = stats.hp / damage;
-        // this.makeHPbar1(0, healthbarPosition, 250, 120, 20);
-        // this.hpDecreaser(stats, damage, isFighterFirst);
+        this.healthDecreaser = stats.hp / damage;
+        this.makeHPbar1(0, healthbarPosition, 250, 120, 20);
+        this.hpDecreaser(stats, damage, this.doAllyAttackFirst);
 
         attacker.x -= 1;
       } else if (attacker.x <= startingPosition && this.moveBackward) {
@@ -259,9 +255,9 @@ class Sprite {
 
         this.setBlinking(blinker);
 
-        // this.healthDecreaser = stats.hp / damage;
-        // this.makeHPbar2(0, healthbarPosition, 250, 120, 20);
-        // this.hpDecreaser(stats, damage, isFighterFirst);
+        this.healthDecreaser = stats.hp / damage;
+        this.makeHPbar2(0, healthbarPosition, 250, 120, 20);
+        this.hpDecreaser(stats, damage, this.doAllyAttackFirst);
 
         attacker.x += 1;
       } else if (attacker.x > startingPosition && this.moveBackward) {
@@ -297,7 +293,7 @@ class Sprite {
     clearTimeout(this.id);
   };
 
-  hpDecreaser = () => {
+  hpDecreaser = (stats,damage) => {
     stats.hp -= damage;
   };
 }
