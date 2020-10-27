@@ -1,8 +1,9 @@
-import Battlefield from './Battlefield.js';
+import DisplaySpritesField from './DisplaySpritesField.js';
 
 class App {
   constructor() {
     this.Application = PIXI.Application;
+
     this.app = new this.Application({
       width: 800,
       height: 1600,
@@ -21,7 +22,7 @@ class App {
     document.body.appendChild(this.app.view);
     this.app.renderer.backgroundColor = 0x5555979;
 
-    const game = new Battlefield(this.app, this.battlefield,this.endGame);
+    const game = new DisplaySpritesField(this.app, this.battlefield,this.endGame);
     game.render();
   };
 }

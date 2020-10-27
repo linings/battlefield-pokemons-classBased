@@ -1,14 +1,13 @@
 import FetchToApi from './fetchToApi.js';
 import Sprite from './Sprite.js';
 
-class Battlefield {
-  constructor(app, battlefield,endgame) {
+class DisplaySpritesField {
+  constructor(app, battlefield, endgame) {
     this.fetchToApi = new FetchToApi();
     this.spriteImages = [];
     this.animatedSprite = '';
     this.Text = PIXI.Text;
     this.TextStyle = PIXI.TextStyle;
-    this.Container = PIXI.Container;
     this.Graphics = PIXI.Graphics;
     this.healthDecreaser = 0;
     this.application = app;
@@ -80,10 +79,6 @@ class Battlefield {
   };
 
   displaySprites = (result) => {
-    this.getSpriteImage(result);
-  };
-
-  getSpriteImage = (result) => {
     for (let i = 0; i < result.length; i++) {
       this.spriteImages.push(result[i]['sprite_front']);
     }
@@ -139,10 +134,9 @@ class Battlefield {
         health,
       ]);
 
-      let sprite = new Sprite(this.application, this.battlefield,this.endgame);
+      let sprite = new Sprite(this.application, this.battlefield, this.endgame);
 
       sprite.pickAFighter(animation, result);
-
 
       this.application.stage.addChild(
         animation,
@@ -215,4 +209,4 @@ class Battlefield {
   };
 }
 
-export default Battlefield;
+export default DisplaySpritesField;

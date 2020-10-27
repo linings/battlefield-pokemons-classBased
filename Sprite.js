@@ -1,4 +1,3 @@
-import App from './App.js';
 import EndGame from './EndGame.js';
 
 class Sprite {
@@ -8,8 +7,7 @@ class Sprite {
     this.moveBackward = false;
     this.application = application;
     this.battlefield = battlefield;
-    this.endgame = endgame;
-    this.endgame = new EndGame(this.battlefield, this.endgame);
+    this.endgame = new EndGame(battlefield, endgame);
     this.Container = PIXI.Container;
     this.Graphics = PIXI.Graphics;
     this.TextStyle = PIXI.TextStyle;
@@ -27,8 +25,6 @@ class Sprite {
     });
     this.play;
     this.id;
-    this.healthBar1;
-    this.healthBar2;
   }
 
   pickAFighter = (animation, result) => {
@@ -168,9 +164,7 @@ class Sprite {
   attack = (myStats, competitorStats, sprites, damage) => {
     const [fighter, competitor] = sprites;
 
-    const app = new App();
-    // console.log(app);
-    app.battlefield.ticker.add(() =>
+    this.battlefield.ticker.add(() =>
       this.play(fighter, competitor, myStats, competitorStats, damage)
     );
   };
@@ -210,14 +204,13 @@ class Sprite {
       if (attacker.x < startingPosition && !this.moveBackward) {
         attacker.x += attacker.vx;
       } else if (attacker.x === startingPosition) {
-        this.moveBackward = true;
-        attacker.vx = 0;
-        this.setBlinking(blinker);
-
-        this.healthDecreaser = stats.hp / damage;
-        this.makeHPbar(0, healthbarPosition, 250, 120, 20);
-        this.endgame.decreaseHP(stats, damage, this.doAllyAttackFirst);
-
+        this.takeHPandGoBack(
+          attacker,
+          blinker,
+          stats,
+          damage,
+          healthbarPosition
+        );
         attacker.x -= 1;
       } else if (attacker.x <= startingPosition && this.moveBackward) {
         attacker.x -= attacker.vx;
@@ -226,15 +219,13 @@ class Sprite {
       if (attacker.x > startingPosition && !this.moveBackward) {
         attacker.x -= attacker.vx;
       } else if (attacker.x === startingPosition) {
-        this.moveBackward = true;
-        attacker.vx = 0;
-
-        this.setBlinking(blinker);
-
-        this.healthDecreaser = stats.hp / damage;
-        this.makeHPbar(0, healthbarPosition, 250, 120, 20);
-        this.endgame.decreaseHP(stats, damage, this.doAllyAttackFirst);
-
+        this.takeHPandGoBack(
+          attacker,
+          blinker,
+          stats,
+          damage,
+          healthbarPosition
+        );
         attacker.x += 1;
       } else if (attacker.x > startingPosition && this.moveBackward) {
         attacker.x += attacker.vx;
@@ -245,6 +236,16 @@ class Sprite {
   stopCurrentAndPlayOther = () => {
     this.moveBackward = !this.moveBackward;
     this.doAllyAttackFirst = !this.doAllyAttackFirst;
+  };
+
+  takeHPandGoBack = (attacker, blinker, stats, damage, healthbarPosition) => {
+    this.moveBackward = true;
+    attacker.vx = 0;
+    this.setBlinking(blinker);
+
+    this.healthDecreaser = stats.hp / damage;
+    this.makeHPbar(0, healthbarPosition, 250, 120, 20);
+    this.endgame.decreaseHP(stats, damage, this.doAllyAttackFirst);
   };
 
   delay = (ms) =>

@@ -1,6 +1,5 @@
 class EndGame {
   constructor(battlefield,endgame) {
-    this.Application = PIXI.Application;
     this.TextStyle = PIXI.TextStyle;
     this.Text = PIXI.Text;
     this.gameOverStyle = new this.TextStyle({
@@ -39,8 +38,7 @@ class EndGame {
     this.battlefield = battlefield;
     this.endgame = endgame;
   }
-
-  decreaseHP = (stats, damage, isFighterFirst) => {
+  decreaseHP = (stats, damage, doAllyAttackFirst) => {
     stats.hp -= damage;
 
     if (stats.hp <= 0) {
@@ -48,7 +46,7 @@ class EndGame {
       document.body.appendChild(this.endgame.view);
       this.endgame.renderer.backgroundColor = 0x5553339;
 
-      if (isFighterFirst) {
+      if (doAllyAttackFirst) {
         this.message = new this.Text('You Win!', this.gameOverStyle);
       } else {
         this.message = new this.Text('You Lose!', this.gameOverStyle);
