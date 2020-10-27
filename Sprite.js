@@ -1,12 +1,15 @@
 import App from './App.js';
+import EndGame from './EndGame.js';
 
 class Sprite {
-  constructor(application, battlefield) {
+  constructor(application, battlefield, endgame) {
     this.infoAboutSprite = {};
     this.doAllyAttackFirst = false;
     this.moveBackward = false;
     this.application = application;
     this.battlefield = battlefield;
+    this.endgame = endgame;
+    this.endgame = new EndGame(this.battlefield, this.endgame);
     this.Container = PIXI.Container;
     this.Graphics = PIXI.Graphics;
     this.TextStyle = PIXI.TextStyle;
@@ -50,8 +53,8 @@ class Sprite {
       secondSprite,
     ] = this.loadRandomFighter(result, animation);
 
-    this.makeHPbar1(0, 100, 250, 120, 20, 0);
-    this.makeHPbar2(0, 530, 250, 120, 20, 0);
+    this.makeHPbar(0, 100, 250, 120, 20, 0);
+    this.makeHPbar(0, 530, 250, 120, 20, 0);
 
     this.displayNameOfFighter(fighter, competitor, 120, 550, 220);
 
@@ -61,7 +64,6 @@ class Sprite {
       [firstSprite, secondSprite],
       this.healthDecreaser
     );
-    // competitor.fight(fighter, competitor, [firstSprite, secondSprite]);
   };
 
   loadRandomFighter = (result, animation) => {
@@ -94,11 +96,7 @@ class Sprite {
     return animatedSprite;
   };
 
-  makeHPbar1 = (healthBarPosition, x, y, w, h) => {
-    const app = new App();
-    console.log(app);
-
-    console.log(this);
+  makeHPbar = (healthBarPosition, x, y, w, h) => {
     this.healthBar1 = new this.Container();
     this.healthBar1.position.set(healthBarPosition, 4);
     this.battlefield.stage.addChild(this.healthBar1);
@@ -116,28 +114,6 @@ class Sprite {
     this.healthBar1.addChild(outerBar);
 
     this.healthBar1.outerBarFirst = outerBar;
-  };
-
-  makeHPbar2 = (healthBarPosition, x, y, w, h) => {
-    console.log(this);
-
-    this.healthBar2 = new this.Container();
-    this.healthBar2.position.set(healthBarPosition, 4);
-    this.battlefield.stage.addChild(this.healthBar2);
-
-    let innerBar = new this.Graphics();
-    innerBar.beginFill(0x00bb43);
-    innerBar.drawRect(x, y, w, h);
-    innerBar.endFill();
-    this.healthBar2.addChild(innerBar);
-
-    let outerBar = new this.Graphics();
-    outerBar.beginFill(0xff3300);
-    outerBar.drawRect(x, y, w / this.healthDecreaser, h);
-    outerBar.endFill();
-    this.healthBar2.addChild(outerBar);
-
-    this.healthBar2.outerBarSecond = outerBar;
   };
 
   displayNameOfFighter = (
@@ -239,8 +215,8 @@ class Sprite {
         this.setBlinking(blinker);
 
         this.healthDecreaser = stats.hp / damage;
-        this.makeHPbar1(0, healthbarPosition, 250, 120, 20);
-        this.hpDecreaser(stats, damage, this.doAllyAttackFirst);
+        this.makeHPbar(0, healthbarPosition, 250, 120, 20);
+        this.endgame.decreaseHP(stats, damage, this.doAllyAttackFirst);
 
         attacker.x -= 1;
       } else if (attacker.x <= startingPosition && this.moveBackward) {
@@ -256,8 +232,8 @@ class Sprite {
         this.setBlinking(blinker);
 
         this.healthDecreaser = stats.hp / damage;
-        this.makeHPbar2(0, healthbarPosition, 250, 120, 20);
-        this.hpDecreaser(stats, damage, this.doAllyAttackFirst);
+        this.makeHPbar(0, healthbarPosition, 250, 120, 20);
+        this.endgame.decreaseHP(stats, damage, this.doAllyAttackFirst);
 
         attacker.x += 1;
       } else if (attacker.x > startingPosition && this.moveBackward) {
@@ -291,10 +267,6 @@ class Sprite {
     }
 
     clearTimeout(this.id);
-  };
-
-  hpDecreaser = (stats,damage) => {
-    stats.hp -= damage;
   };
 }
 

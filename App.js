@@ -21,7 +21,7 @@ class App {
     document.body.appendChild(this.app.view);
     this.app.renderer.backgroundColor = 0x5555979;
 
-    const game = new Battlefield(this.app, this.battlefield);
+    const game = new Battlefield(this.app, this.battlefield,this.endGame);
     game.render();
   };
 }

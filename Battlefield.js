@@ -2,7 +2,7 @@ import FetchToApi from './fetchToApi.js';
 import Sprite from './Sprite.js';
 
 class Battlefield {
-  constructor(app, battlefield) {
+  constructor(app, battlefield,endgame) {
     this.fetchToApi = new FetchToApi();
     this.spriteImages = [];
     this.animatedSprite = '';
@@ -13,6 +13,7 @@ class Battlefield {
     this.healthDecreaser = 0;
     this.application = app;
     this.battlefield = battlefield;
+    this.endgame = endgame;
     this.style = new this.TextStyle({
       fontFamily: 'Arial',
       fontSize: 12,
@@ -138,7 +139,7 @@ class Battlefield {
         health,
       ]);
 
-      let sprite = new Sprite(this.application, this.battlefield);
+      let sprite = new Sprite(this.application, this.battlefield,this.endgame);
 
       sprite.pickAFighter(animation, result);
 
